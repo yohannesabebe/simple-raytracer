@@ -94,9 +94,10 @@ def create_showcase_scene() -> Scene:
     )
     scene.add_object(Sphere(center=(0.2, 0.5, 2.0), radius=0.5, material=emerald_material))
 
-    # Dual point lights for vibrant multi-light rendering
+    # 3-Point lighting setup (Key, Fill, and Back rim light) for full 360-degree orbit coverage
     scene.add_light(PointLight(position=(-5.0, 8.0, 4.0), color=(1.0, 0.95, 0.85), intensity=1.1))
     scene.add_light(PointLight(position=(5.0, 6.0, 2.0), color=(0.7, 0.85, 1.0), intensity=0.9))
+    scene.add_light(PointLight(position=(0.0, 7.0, -5.0), color=(0.85, 0.9, 1.0), intensity=0.6))
 
     return scene
 
@@ -106,7 +107,7 @@ def create_classic_three_spheres_scene() -> Scene:
     Classic computer graphics lab benchmark scene:
     Three spheres (Red, Green, Blue) over a neutral ground.
     """
-    scene = Scene(name="Three Spheres Lab", ambient_light=AmbientLight(intensity=0.15))
+    scene = Scene(name="Three Spheres Lab", ambient_light=AmbientLight(intensity=0.18))
 
     # Matte ground
     ground_mat = Material(diffuse=(0.7, 0.7, 0.7), specular=(0.2, 0.2, 0.2), shininess=16.0, reflectivity=0.1)
@@ -127,7 +128,8 @@ def create_classic_three_spheres_scene() -> Scene:
         diffuse=(0.15, 0.3, 0.9), specular=(1.0, 1.0, 1.0), shininess=96.0, reflectivity=0.25
     )))
 
-    scene.add_light(PointLight(position=(2.0, 6.0, 4.0), color=(1.0, 1.0, 1.0), intensity=1.2))
+    scene.add_light(PointLight(position=(2.0, 6.0, 4.0), color=(1.0, 1.0, 1.0), intensity=1.1))
+    scene.add_light(PointLight(position=(-2.0, 5.0, -4.0), color=(0.8, 0.85, 1.0), intensity=0.6))
     return scene
 
 
@@ -135,7 +137,7 @@ def create_reflective_infinity_scene() -> Scene:
     """
     Scene demonstrating deep recursive specular reflection with opposing reflective surfaces.
     """
-    scene = Scene(name="Recursive Reflections", ambient_light=AmbientLight(intensity=0.1))
+    scene = Scene(name="Recursive Reflections", ambient_light=AmbientLight(intensity=0.12))
 
     # Mirror floor
     floor_mat = Material(
@@ -166,7 +168,8 @@ def create_reflective_infinity_scene() -> Scene:
         diffuse=(1.0, 0.8, 0.1), specular=(1.0, 1.0, 1.0), shininess=64.0, reflectivity=0.5
     )))
 
-    scene.add_light(PointLight(position=(0.0, 7.0, 0.0), color=(1.0, 1.0, 1.0), intensity=1.5))
-    scene.add_light(PointLight(position=(-4.0, 4.0, 3.0), color=(0.4, 0.6, 1.0), intensity=0.8))
+    scene.add_light(PointLight(position=(0.0, 7.0, 0.0), color=(1.0, 1.0, 1.0), intensity=1.4))
+    scene.add_light(PointLight(position=(-4.0, 4.0, 3.0), color=(0.4, 0.6, 1.0), intensity=0.7))
+    scene.add_light(PointLight(position=(4.0, 5.0, -3.0), color=(0.9, 0.75, 0.5), intensity=0.6))
 
     return scene

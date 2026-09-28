@@ -201,21 +201,21 @@ class GLViewer:
             self.needs_render = True
 
     def _mouse_button_callback(self, window, button, action, mods):
-        if button == glfw.MOUSE_BUTTON_LEFT:
+        if button in (glfw.MOUSE_BUTTON_LEFT, glfw.MOUSE_BUTTON_RIGHT):
             if action == glfw.PRESS:
-                self.mouse_left_down = True
+                cur_x, cur_y = glfw.get_cursor_pos(window)
+                self.last_mouse_x = cur_x
+                self.last_mouse_y = cur_y
+                if button == glfw.MOUSE_BUTTON_LEFT:
+                    self.mouse_left_down = True
+                else:
+                    self.mouse_right_down = True
                 self.is_interacting = True
             elif action == glfw.RELEASE:
-                self.mouse_left_down = False
-                self.is_interacting = False
-                self.needs_render = True
-                
-        elif button == glfw.MOUSE_BUTTON_RIGHT:
-            if action == glfw.PRESS:
-                self.mouse_right_down = True
-                self.is_interacting = True
-            elif action == glfw.RELEASE:
-                self.mouse_right_down = False
+                if button == glfw.MOUSE_BUTTON_LEFT:
+                    self.mouse_left_down = False
+                else:
+                    self.mouse_right_down = False
                 self.is_interacting = False
                 self.needs_render = True
 
@@ -343,6 +343,7 @@ class GLViewer:
         Uploads uint8 RGB numpy array into OpenGL texture.
         """
         glBindTexture(GL_TEXTURE_2D, self.texture_id)
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
         glTexImage2D(
             GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data
         )

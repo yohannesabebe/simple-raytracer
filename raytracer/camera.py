@@ -43,13 +43,26 @@ class Camera:
     def _update_vectors(self):
         """
         Recomputes camera orthonormal coordinate system (u, v, forward).
+        Guarantees that the camera eye never dips beneath the ground plane (y >= 0.15).
         """
+        # Keep target above the floor
+        self.target[1] = max(float(self.target[1]), 0.2)
+        
+        # Calculate pitch lower bound so camera eye height (eye.y) is always >= 0.15
+        # eye.y = target.y + radius * sin(pitch) >= 0.15
+        min_sin = (0.15 - self.target[1]) / max(self.radius, 0.5)
+        min_sin = float(np.clip(min_sin, -0.99, 0.99))
+        min_pitch = float(np.arcsin(min_sin))
+        max_pitch = float(np.radians(88.0))
+        self.pitch = float(np.clip(self.pitch, min_pitch, max_pitch))
+
         # Calculate eye position from spherical coordinates
         cos_pitch = np.cos(self.pitch)
         x = self.radius * cos_pitch * np.sin(self.yaw)
         y = self.radius * np.sin(self.pitch)
         z = self.radius * cos_pitch * np.cos(self.yaw)
         self.eye = self.target + np.array([x, y, z], dtype=np.float32)
+        self.eye[1] = max(float(self.eye[1]), 0.15)
         
         # Camera look direction
         self.forward = normalize(self.target - self.eye)
@@ -65,12 +78,10 @@ class Camera:
 
     def orbit(self, delta_yaw: float, delta_pitch: float):
         """
-        Rotates camera around target.
+        Rotates camera around target while constraining pitch above ground.
         """
         self.yaw += delta_yaw
-        # Constrain pitch to avoid flipping over poles (-89 to +89 degrees)
-        max_pitch = np.radians(89.0)
-        self.pitch = float(np.clip(self.pitch + delta_pitch, -max_pitch, max_pitch))
+        self.pitch += delta_pitch
         self._update_vectors()
 
     def zoom(self, delta_radius: float):
@@ -86,6 +97,7 @@ class Camera:
         """
         offset = -self.right * delta_x + self.up * delta_y
         self.target += offset
+        self.target[1] = max(float(self.target[1]), 0.2)
         self._update_vectors()
 
     def set_aspect_ratio(self, width: int, height: int):

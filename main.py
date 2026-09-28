@@ -64,10 +64,30 @@ def run_cli_render(args):
     print(f"[CLI Render] Result saved to: {args.output}")
 
 
+def disable_windows_quickedit():
+    """
+    On Windows, clicking/dragging inside a terminal window enables QuickEdit mode,
+    which freezes the running Python process and highlights/darkens terminal text.
+    This helper turns off QuickEdit mode for a smooth interactive experience.
+    """
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            kernel32 = ctypes.windll.kernel32
+            h_stdin = kernel32.GetStdHandle(-10)  # STD_INPUT_HANDLE = -10
+            mode = ctypes.c_ulong()
+            if kernel32.GetConsoleMode(h_stdin, ctypes.byref(mode)):
+                # Clear ENABLE_QUICK_EDIT_MODE (0x0040)
+                kernel32.SetConsoleMode(h_stdin, mode.value & ~0x0040)
+        except Exception:
+            pass
+
+
 def run_interactive_viewer(args):
     """
     Launches GLFW + OpenGL interactive GUI.
     """
+    disable_windows_quickedit()
     from viewer.gl_display import GLViewer
     viewer = GLViewer(window_width=args.width, window_height=args.height)
     viewer.run()
